@@ -5,31 +5,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const dotenv_1 = __importDefault(require("dotenv"));
-const data_json_1 = __importDefault(require("./data.json"));
+const routes_1 = require("./routes/routes");
+const housing_1 = require("./controllers/housing");
+const loggers_1 = require("./middlewares/loggers");
+const about_1 = require("./controllers/about");
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const port = process.env.PORT || 3000;
-app.get("/housing", (req, res) => {
-    const enlightenedData = data_json_1.default.map((h) => {
-        return {
-            id: h.id,
-            title: h.title,
-            cover: h.cover,
-        };
-    });
-    // return the modified data with code 200
-    res.json(enlightenedData);
-});
-app.get("/housing/:id", (req, res) => {
-    const id = req.params.id;
-    const housing = data_json_1.default.find((h) => h.id === id);
-    if (housing) {
-        res.json(housing);
-    }
-    else {
-        res.status(404).send();
-    }
-});
+app.get(routes_1.Routes.HOUSING, loggers_1.requestLoggerMiddleware, housing_1.getHousing);
+app.get(routes_1.Routes.HOUSING_ID, loggers_1.requestLoggerMiddleware, housing_1.getHousingById);
+app.get(routes_1.Routes.ABOUT, loggers_1.requestLoggerMiddleware, about_1.getAbout);
 app.listen(port, () => {
     console.log(`[server]: Server is running at http://localhost:${port}`);
 });

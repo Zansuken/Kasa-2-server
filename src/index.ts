@@ -1,34 +1,20 @@
 import express, { Express, Request, Response } from "express";
 import dotenv from "dotenv";
-import data from "./data.json";
+import housing from "./housing.json";
+import { Routes } from "./routes/routes";
+import { getHousing, getHousingById } from "./controllers/housing";
+import { requestLoggerMiddleware } from "./middlewares/loggers";
+import { getAbout } from "./controllers/about";
 
 dotenv.config();
 
 const app: Express = express();
 const port = process.env.PORT || 3000;
 
-app.get("/housing", (req: Request, res: Response) => {
-  const enlightenedData = data.map((h: any) => {
-    return {
-      id: h.id,
-      title: h.title,
-      cover: h.cover,
-    };
-  });
+app.get(Routes.HOUSING, requestLoggerMiddleware, getHousing);
+app.get(Routes.HOUSING_ID, requestLoggerMiddleware, getHousingById);
 
-  // return the modified data with code 200
-  res.json(enlightenedData);
-});
-
-app.get("/housing/:id", (req: Request, res: Response) => {
-  const id = req.params.id;
-  const housing = data.find((h: any) => h.id === id);
-  if (housing) {
-    res.json(housing);
-  } else {
-    res.status(404).send();
-  }
-});
+app.get(Routes.ABOUT, requestLoggerMiddleware, getAbout);
 
 app.listen(port, () => {
   console.log(`[server]: Server is running at http://localhost:${port}`);
